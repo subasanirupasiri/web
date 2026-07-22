@@ -6,6 +6,7 @@ import { DashboardView } from "@/components/DashboardView";
 import { QuickAddView } from "@/components/QuickAddView";
 import { HistoryView } from "@/components/HistoryView";
 import { AdminPanel } from "@/components/AdminPanel";
+import { WeatherDashboardView } from "@/components/weather/WeatherDashboardView";
 import { loadPrices, savePrices } from "@/lib/storage";
 import type { PriceEntry, ViewTab } from "@/lib/types";
 
@@ -53,6 +54,7 @@ export function MarketDashboard() {
           onQuickAdd={() => setActiveTab("add")}
         />
       )}
+      {activeTab === "weather" && <WeatherDashboardView />}
       {activeTab === "add" && (
         <QuickAddView
           prices={prices}

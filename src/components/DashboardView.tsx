@@ -318,12 +318,14 @@ function StatCard({
   sub,
   accent,
   isEmoji,
+  delay,
 }: {
   label: string;
   value: string;
   sub: string;
   accent: "primary" | "accent" | "neutral" | "up" | "down";
   isEmoji?: boolean;
+  delay?: number;
 }) {
   const bgMap = {
     primary: "bg-primary/8 border-primary/15",

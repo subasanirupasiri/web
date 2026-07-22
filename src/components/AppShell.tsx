@@ -2,6 +2,7 @@
 
 import {
   LayoutDashboard,
+  CloudSun,
   PlusCircle,
   History,
   Leaf,
@@ -21,6 +22,7 @@ interface AppShellProps {
 const NAV_ITEMS: { id: ViewTab; label: string; icon: typeof LayoutDashboard }[] =
   [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "weather", label: "Weather Map", icon: CloudSun },
     { id: "add", label: "Add Prices", icon: PlusCircle },
     { id: "history", label: "History", icon: History },
     { id: "admin", label: "Admin", icon: Settings },

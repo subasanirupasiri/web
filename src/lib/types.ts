@@ -41,4 +41,4 @@ export interface PriceEntry {
   note?: string;
 }
 
-export type ViewTab = "dashboard" | "add" | "history" | "admin";
+export type ViewTab = "dashboard" | "weather" | "add" | "history" | "admin";
