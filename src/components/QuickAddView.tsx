@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
-import { MARKETS, VEGETABLES } from "@/lib/demo-data";
+import { MARKETS, VEGETABLES, CATEGORIES, ITEMS } from "@/lib/demo-data";
 import type { PriceEntry } from "@/lib/types";
 import { generateId } from "@/lib/storage";
 import { formatCurrency, todayISO } from "@/lib/utils";
@@ -35,14 +35,16 @@ export function QuickAddView({
   const [step, setStep] = useState<Step>("setup");
   const [marketId, setMarketId] = useState(initialMarket ?? "dambulla");
   const [date, setDate] = useState(todayISO());
+  const [categoryId, setCategoryId] = useState("vegetables");
   const [vegIndex, setVegIndex] = useState(0);
   const [priceInput, setPriceInput] = useState("");
   const [savedCount, setSavedCount] = useState(0);
   const [sessionEntries, setSessionEntries] = useState<PriceEntry[]>([]);
 
-  const currentVeg = VEGETABLES[vegIndex];
+  const categoryItems = ITEMS.filter((i) => i.categoryId === categoryId);
+  const currentVeg = categoryItems[vegIndex];
   const market = MARKETS.find((m) => m.id === marketId)!;
-  const progress = ((vegIndex + (step === "done" ? 1 : 0)) / VEGETABLES.length) * 100;
+  const progress = categoryItems.length > 0 ? ((vegIndex + (step === "done" ? 1 : 0)) / categoryItems.length) * 100 : 0;
 
   const existingForCurrent = prices.find(
     (p) =>
@@ -87,7 +89,7 @@ export function QuickAddView({
     setSessionEntries((prev) => [...prev, entry]);
     setSavedCount((c) => c + 1);
 
-    if (vegIndex < VEGETABLES.length - 1) {
+    if (vegIndex < categoryItems.length - 1) {
       setVegIndex((i) => i + 1);
       setPriceInput("");
     } else {
@@ -102,10 +104,11 @@ export function QuickAddView({
     prices,
     onSave,
     vegIndex,
+    categoryItems,
   ]);
 
   const skipCurrent = () => {
-    if (vegIndex < VEGETABLES.length - 1) {
+    if (vegIndex < categoryItems.length - 1) {
       setVegIndex((i) => i + 1);
       setPriceInput("");
     } else {
@@ -133,6 +136,7 @@ export function QuickAddView({
     setPriceInput("");
     setSavedCount(0);
     setSessionEntries([]);
+    setCategoryId("vegetables");
   };
 
   if (step === "setup") {
@@ -167,6 +171,32 @@ export function QuickAddView({
                   <div>
                     <p className="font-semibold text-text">{m.name}</p>
                     <p className="text-xs text-text-muted">{m.district}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="mb-2 flex items-center gap-2 text-sm font-semibold text-text">
+              Category
+            </label>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {CATEGORIES.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => setCategoryId(cat.id)}
+                  className={cn(
+                    "flex items-center gap-3 rounded-xl border p-3 text-left text-sm transition-all",
+                    categoryId === cat.id
+                      ? "border-primary bg-primary/5 ring-2 ring-primary/20"
+                      : "border-border hover:border-primary/30"
+                  )}
+                >
+                  <span className="text-xl">{cat.emoji}</span>
+                  <div>
+                    <p className="font-semibold text-text">{cat.name}</p>
+                    <p className="text-xs text-text-muted">{cat.nameSi}</p>
                   </div>
                 </button>
               ))}
@@ -224,14 +254,14 @@ export function QuickAddView({
             <p className="mb-3 text-sm font-semibold text-text">Saved today</p>
             <div className="space-y-2">
               {sessionEntries.map((e) => {
-                const veg = VEGETABLES.find((v) => v.id === e.vegetableId)!;
+                const item = ITEMS.find((i) => i.id === e.vegetableId)!;
                 return (
                   <div
                     key={e.id}
                     className="flex items-center justify-between text-sm"
                   >
                     <span>
-                      {veg.emoji} {veg.name}
+                      {item.emoji} {item.name}
                     </span>
                     <span className="font-semibold">
                       {formatCurrency(e.price)}
@@ -262,7 +292,7 @@ export function QuickAddView({
             {market.emoji} {market.name.split(" ")[0]}
           </span>
           <span className="font-semibold text-primary">
-            {vegIndex + 1} / {VEGETABLES.length}
+            {vegIndex + 1} / {categoryItems.length}
           </span>
         </div>
         <div className="h-2 overflow-hidden rounded-full bg-border/60">
@@ -275,7 +305,7 @@ export function QuickAddView({
 
       {/* Vegetable chips preview */}
       <div className="flex gap-1.5 overflow-x-auto pb-1 scrollbar-hide">
-        {VEGETABLES.map((v, i) => (
+        {categoryItems.map((v, i) => (
           <button
             key={v.id}
             onClick={() => setVegIndex(i)}
@@ -299,6 +329,11 @@ export function QuickAddView({
           <span className="text-6xl">{currentVeg.emoji}</span>
           <h2 className="mt-3 text-2xl font-bold text-text">{currentVeg.name}</h2>
           <p className="text-sm text-text-muted">{currentVeg.nameSi}</p>
+          {currentVeg.minPrice && currentVeg.maxPrice && (
+            <p className="mt-2 text-xs text-text-muted">
+              Typical price range: Rs. {currentVeg.minPrice} - {currentVeg.maxPrice}
+            </p>
+          )}
           {existingForCurrent && (
             <p className="mt-2 text-xs text-accent-dark">
               Existing: {formatCurrency(existingForCurrent.price)} — update below
@@ -346,7 +381,7 @@ export function QuickAddView({
           disabled={!priceInput || parseFloat(priceInput) <= 0}
           onClick={saveCurrentAndNext}
         >
-          {vegIndex < VEGETABLES.length - 1 ? (
+          {vegIndex < categoryItems.length - 1 ? (
             <>
               Save & Next
               <ChevronRight className="h-5 w-5" />
@@ -361,10 +396,10 @@ export function QuickAddView({
       </div>
 
       {/* Next preview */}
-      {vegIndex < VEGETABLES.length - 1 && (
+      {vegIndex < categoryItems.length - 1 && (
         <p className="text-center text-xs text-text-muted">
-          Up next: {VEGETABLES[vegIndex + 1].emoji}{" "}
-          {VEGETABLES[vegIndex + 1].name}
+          Up next: {categoryItems[vegIndex + 1].emoji}{" "}
+          {categoryItems[vegIndex + 1].name}
         </p>
       )}
     </div>

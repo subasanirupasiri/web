@@ -6,6 +6,24 @@ export interface MarketCenter {
   emoji: string;
 }
 
+export interface Category {
+  id: string;
+  name: string;
+  nameSi: string;
+  emoji: string;
+}
+
+export interface Item {
+  id: string;
+  categoryId: string;
+  name: string;
+  nameSi: string;
+  emoji: string;
+  unit: string;
+  minPrice?: number;
+  maxPrice?: number;
+}
+
 export interface Vegetable {
   id: string;
   name: string;
@@ -23,4 +41,4 @@ export interface PriceEntry {
   note?: string;
 }
 
-export type ViewTab = "dashboard" | "add" | "history";
+export type ViewTab = "dashboard" | "add" | "history" | "admin";

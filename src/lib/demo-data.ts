@@ -1,4 +1,4 @@
-import type { MarketCenter, PriceEntry, Vegetable } from "./types";
+import type { MarketCenter, PriceEntry, Vegetable, Category, Item } from "./types";
 
 export const MARKETS: MarketCenter[] = [
   {
@@ -43,6 +43,35 @@ export const MARKETS: MarketCenter[] = [
     district: "Colombo",
     emoji: "🏙️",
   },
+];
+
+export const CATEGORIES: Category[] = [
+  { id: "vegetables", name: "Vegetables", nameSi: "එළවළු", emoji: "🥬" },
+  { id: "fruits", name: "Fruits", nameSi: "පලතුරු", emoji: "🍎" },
+];
+
+export const ITEMS: Item[] = [
+  // Vegetables
+  { id: "beans", categoryId: "vegetables", name: "Beans", nameSi: "බෝංචි", emoji: "🫘", unit: "kg", minPrice: 200, maxPrice: 250 },
+  { id: "carrot", categoryId: "vegetables", name: "Carrot", nameSi: "කැරට්", emoji: "🥕", unit: "kg", minPrice: 250, maxPrice: 300 },
+  { id: "tomato", categoryId: "vegetables", name: "Tomato", nameSi: "තක්කාලි", emoji: "🍅", unit: "kg", minPrice: 300, maxPrice: 400 },
+  { id: "potato", categoryId: "vegetables", name: "Potato", nameSi: "අල", emoji: "🥔", unit: "kg", minPrice: 180, maxPrice: 250 },
+  { id: "onion", categoryId: "vegetables", name: "Onion", nameSi: "ලූණු", emoji: "🧅", unit: "kg", minPrice: 280, maxPrice: 350 },
+  { id: "cabbage", categoryId: "vegetables", name: "Cabbage", nameSi: "ගෝවා", emoji: "🥬", unit: "kg", minPrice: 150, maxPrice: 200 },
+  { id: "brinjal", categoryId: "vegetables", name: "Brinjal", nameSi: "වම්බටු", emoji: "🍆", unit: "kg", minPrice: 250, maxPrice: 320 },
+  { id: "green-chilli", categoryId: "vegetables", name: "Green Chilli", nameSi: "මිරිස්", emoji: "🌶️", unit: "kg", minPrice: 600, maxPrice: 750 },
+  { id: "pumpkin", categoryId: "vegetables", name: "Pumpkin", nameSi: "Wattakka", emoji: "🎃", unit: "kg", minPrice: 120, maxPrice: 180 },
+  { id: "okra", categoryId: "vegetables", name: "Ladies Finger", nameSi: "බඩඉක්ක", emoji: "🌱", unit: "kg", minPrice: 280, maxPrice: 350 },
+  { id: "beetroot", categoryId: "vegetables", name: "Beetroot", nameSi: "බීට්", emoji: "🔴", unit: "kg", minPrice: 220, maxPrice: 280 },
+  { id: "leeks", categoryId: "vegetables", name: "Leeks", nameSi: "ලීක්ස්", emoji: "🧄", unit: "kg", minPrice: 320, maxPrice: 400 },
+  // Fruits
+  { id: "rambutan", categoryId: "fruits", name: "Rambutan", nameSi: "රඹුටන්", emoji: "🍒", unit: "kg", minPrice: 300, maxPrice: 500 },
+  { id: "mango", categoryId: "fruits", name: "Mango", nameSi: "අඹ", emoji: "🥭", unit: "kg", minPrice: 250, maxPrice: 400 },
+  { id: "banana", categoryId: "fruits", name: "Banana", nameSi: "කෙසෙල්", emoji: "🍌", unit: "kg", minPrice: 150, maxPrice: 250 },
+  { id: "papaya", categoryId: "fruits", name: "Papaya", nameSi: "පැපොල්", emoji: "🍈", unit: "kg", minPrice: 100, maxPrice: 180 },
+  { id: "pineapple", categoryId: "fruits", name: "Pineapple", nameSi: "අනාස්", emoji: "🍍", unit: "kg", minPrice: 150, maxPrice: 250 },
+  { id: "guava", categoryId: "fruits", name: "Guava", nameSi: "පේර", emoji: "🍐", unit: "kg", minPrice: 120, maxPrice: 200 },
+  { id: "watermelon", categoryId: "fruits", name: "Watermelon", nameSi: "දෙපල්", emoji: "🍉", unit: "kg", minPrice: 80, maxPrice: 150 },
 ];
 
 export const VEGETABLES: Vegetable[] = [
