@@ -126,28 +126,17 @@ export function SriLankaWeatherMap({
       .catch(() => {});
   }, []);
 
-  // ── Auto-focus district & load curated GN data ───────────────────
+  // ── Preload curated GN data when district selected (no auto-zoom) ──
+  // Map stays in place — district detail opens in bottom drawer instead.
   useEffect(() => {
-    if (selectedDistrictId && SRI_LANKA_DISTRICTS[selectedDistrictId]) {
-      const geo = SRI_LANKA_DISTRICTS[selectedDistrictId];
-      // Compute pan so district centroid lands at canvas center
-      const targetZoom = 2.8;
-      const newPanX = (SVG_W / 2 - geo.centroid.cx) * targetZoom;
-      const newPanY = (SVG_H / 2 - geo.centroid.cy) * targetZoom;
-      setZoom(targetZoom);
-      setPan({ x: newPanX, y: newPanY });
-
-      // Preload curated GN data immediately
-      const curated = getCuratedGNForDistrict(selectedDistrictId);
-      setGnDivisions((prev) => {
-        const ids = new Set(prev.map((g) => g.id));
-        return [...prev, ...curated.filter((g) => !ids.has(g.id))];
-      });
-    } else if (!selectedDistrictId) {
-      setZoom(1);
-      setPan({ x: 0, y: 0 });
-    }
+    if (!selectedDistrictId) return;
+    const curated = getCuratedGNForDistrict(selectedDistrictId);
+    setGnDivisions((prev) => {
+      const ids = new Set(prev.map((g) => g.id));
+      return [...prev, ...curated.filter((g) => !ids.has(g.id))];
+    });
   }, [selectedDistrictId]);
+
 
   // ── Compute viewport lat/lng bounds from zoom + pan ───────────────
   const getViewportBounds = useCallback((): ViewportBounds => {
@@ -240,8 +229,10 @@ export function SriLankaWeatherMap({
   }, []);
 
   // ── Mouse-wheel handler — cursor-anchored zoom ────────────────────
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
+  // NOTE: We use a direct DOM listener (non-passive) via useEffect below
+  // so that e.preventDefault() actually stops the page from scrolling.
+  const handleWheelNative = useCallback((e: WheelEvent) => {
+    e.preventDefault();  // stop page scroll — only works in non-passive listener
     if (!containerRef.current) return;
 
     const rect   = containerRef.current.getBoundingClientRect();
@@ -254,16 +245,21 @@ export function SriLankaWeatherMap({
     const mx = e.clientX - rect.left - rect.width / 2;
     const my = e.clientY - rect.top  - rect.height / 2;
 
-    // Pan adjustment so the point under cursor stays fixed:
-    // newPan = oldPan * (newZ / oldZ) + mouse * (1 - newZ / oldZ)
+    // Pan so the point under the cursor stays fixed:
+    // newPan = oldPan × (newZ/oldZ) + cursorOffset × (1 − newZ/oldZ)
     const ratio = newZ / oldZ;
     const oldP  = panRef.current;
-    const newPX = oldP.x * ratio + mx * (1 - ratio);
-    const newPY = oldP.y * ratio + my * (1 - ratio);
-
     setZoom(newZ);
-    setPan({ x: newPX, y: newPY });
+    setPan({ x: oldP.x * ratio + mx * (1 - ratio), y: oldP.y * ratio + my * (1 - ratio) });
   }, []);
+
+  // Attach non-passive wheel listener to the container element
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.addEventListener("wheel", handleWheelNative, { passive: false });
+    return () => el.removeEventListener("wheel", handleWheelNative);
+  }, [handleWheelNative]);
 
   // ── Drag-pan handlers ─────────────────────────────────────────────
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
@@ -397,7 +393,6 @@ export function SriLankaWeatherMap({
       {/* ── Main canvas ──────────────────────────────────────── */}
       <div
         ref={containerRef}
-        onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
